@@ -1,4 +1,4 @@
-
+git clone <repository_url>
 git config --global user.email "sanjayar2200@gmail.com"
 
 git fetch
