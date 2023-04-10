@@ -1,0 +1,311 @@
+CDH INSTALLATION STEPS:
+=======================
+
+step1: Do all the necessary prechecks:
+
+>enable internet and httpd&ntpd services should be enabled.
+>hostname should be changed (hostname and hostname -f  -->be same )
+>disable the firewall  
+sudo systemctl disable firewalld
+sudo systemctl mask --now firewalld
+
+service firewalld status    
+
+yum install ntp httpd   ---> 
+
+systemctl enable httpd
+systemctl enable ntpd
+
+service ntpd start     
+service httpd start
+
+chkconfig httpd on
+chkconfig ntpd on
+
+Verify server time sync:
+-----------------------
+ntpq -p 
+date
+
+ yum install nfs-utils
+
+service rpcbind start
+chkconfig rpcbind on  
+/etc/netconfig
+
+vi /etc/hosts --> check hostname and hostname -f are same --> if not change it
+
+If the hostname is not changing then use the below command:
+$service network status
+$service network restart 
+
+hostnamectl set-hostname <hostname>
+pr11036stc
+hostnamectl set-hostname cloudera-dp-masternode-svr1
+exec bash
+
+echo "vm.swappiness = 0" >> /etc/sysctl.conf    > should be zero to 30 for hadooop clusters: 
+echo "vm.swappiness = 0" >> /root/sanj.txt    
+
+sestatus --> it should be disabled --> if enabled then run the below command
+sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config    --> 
+reboot
+
+Install all the necessary packages:  
+-----------------------------------
+
+wget --user=b57fe95e-c35b-4d0c-b178-9627b4bd761b --password=fb73a6dadd17 https://arcscm.cloudera.com/p/cdh6/6.3.3/parcels/CDH-6.3.3-1.cdh6.3.3.p0.1796617-el7.parcel
+
+
+wget --user=b57fe95e-c35b-4d0c-b178-9627b4bd761b --password=fb73a6dadd17 https://arcscm.cloudera.com/p/cdh6/6.3.3/parcels/CDH-6.3.3-1.cdh6.3.3.p0.1796617-el7.parcel.sha256
+
+wget --user=b57fe95e-c35b-4d0c-b178-9627b4bd761b --password=fb73a6dadd17 https://arcscm.cloudera.com/p/cdh6/6.3.3/parcels/manifest.json
+
+wget --user b57fe95e-c35b-4d0c-b178-9627b4bd761b --password fb73a6dadd17 https://arcscm.cloudera.com/p/cm6/6.3.3/repo-as-tarball/cm6.3.3-redhat7.tar.gz
+
+If it is local repo then, 
+once the 4th wget package is installed move the installed tar file to the /var/www/html directory 
+
+cd /var/www/html
+mv <tarfile> /var/www/html/
+tar -xvf <tarfile>   ---> unzip it 
+
+Copying Java jdkfile and database connector from the servers:
+-----------------------------------------------------
+
+scp -pr <jdkfile> subexuser@<ip>:/tmp
+scp javafilename oracle@<ip>:<path>    ---> rename the file to cloudera
+
+--> yum repos.d# yum install -y openjdk
+--> # alternatives --install /usr/java/jdk1.8.0_181-cloudera/bin:$PATH
+--> # alternatives --config java
+
+sudo update-alternatives --install /usr/bin/javac javac /opt/java/jdk1.8.0_144/bin/javac 1
+
+update-alternatives --install /usr/bin/java java /usr/java/jdk1.8.0_181-cloudera/bin/java 1
+update-alternatives --config java
+
+--># alternatives --install /usr/bin/java java /usr/java/jdk1.8.0_181-cloudera/jre/bin/ 200000
+--># alternatives --config java
+
+yum remove java-1.7* 
+ 
+mkdir -p /usr/java
+mv <jdkfile> /usr/java
+tar -xvf javafilename  
+
+java configuration:
+-------------------
+Export the java home and path in the bahsrc
+
+vi .bashrc
+
+export PATH=$PATH:/usr/java/jdk1.8.0_181-cloudera/bin:$PATH
+export JAVA_HOME=/usr/java/jdk1.8.0_181-cloudera
+
+export PATH=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.262.b10-1.el7.x86_64/jre/bin:$PATH 
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.262.b10-1.el7.x86_64/jre 
+
+/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.262.b10-1.el7.x86_64/jre
+export PATH=$PATH:/usr/java/jdk1.8.0_251/bin:$PATH
+export JAVA_HOME=/usr/java/jdk1.8.0_251
+-----------
+execute the bashrc command:
+$. .bashrc
+$java -version   --> 
+
+configuring repos: Note: JDK should be installed before creating repos 
+------------------
+#vi cldmgr.repo 
+
+if it is a local repo: 
+#cat cldmgr.repo
+name = Cloudera Manager
+baseurl = http://172.31.16.111/cm7.1.4/
+gpgcheck = 0 
+
+If it is a public repo: CDP
+
+[cloudera-manager]
+name=Cloudera Manager 7.4.4
+# Replace changeme:changeme with your paywall username and password below.
+baseurl=https://b57fe95e-c35b-4d0c-b178-9627b4bd761b:fb73a6dadd17@archive.cloudera.com/p/cm7/7.4.4/redhat7/yum/
+gpgkey=https://b57fe95e-c35b-4d0c-b178-9627b4bd761b:fb73a6dadd17@archive.cloudera.com/p/cm7/7.4.4/redhat7/yum/RPM-GPG-KEY-cloudera
+gpgcheck=1
+enabled=1
+autorefresh=0
+type=rpm-md
+ 
+ 
+ https://archive.cloudera.com/p/cdh6/6.3.3/parcels/
+ https://archive.cloudera.com/p/cm7/7.6.1/redhat7/yum/
+--------------------------------------------------------------
+If it is a public repo: CDP
+
+
+[cloudera-manager]
+name=Cloudera Manager 7.4.4
+# Replace changeme:changeme with your paywall username and password below.
+baseurl=https://changeme:changeme@archive.cloudera.com/p/cm7/7.4.4/redhat7/yum/
+gpgkey=https://changeme:changeme@archive.cloudera.com/p/cm7/7.4.4/redhat7/yum/RPM-GPG-KEY-cloudera
+gpgcheck=1
+enabled=1
+username=7d5b3b25-63e5-4703-b061-005c4da29ffe
+password=26e9de1e822f
+autorefresh=0
+type=rpm-md
+
+[postgresql10]
+name=Postgresql 10
+baseurl=https://archive.cloudera.com/postgresql10/redhat7/
+gpgkey=https://archive.cloudera.com/postgresql10/redhat7/RPM-GPG-KEY-PGDG-10
+enabled=1
+gpgcheck=1
+module_hotfixes=true
+
+---------------------------------------------------------------------
+
+yum repolist
+yum makecache
+
+yum list all | grep cloudera
+yum install agent,deambari.server 
+
+vi /etc/cloudera-scm-agent/config.ini    ---> replacing server host with full hostname --> for multinode cluster all hostname changes req
+
+
+Now login to database in oracle and postgres and create user:
+
+
+create user scm identified by scm ;
+create user scm identified by scm;
+create user amon identified by amon;
+create user rman identified by rman;
+create user hue identified by hue;
+create user sentry identified by sentry;
+create user nav identified by nav;
+create user navms identified by navms;
+create user oozie identified by oozie;
+
+grant dba to scm ;
+grant dba to scm ;
+grant dba to amon ;
+grant dba to rman ;
+grant dba to hue ;
+grant dba to sentry ;
+grant dba to nav ;
+grant dba to navms ;
+grant dba to oozie ;
+
+grant execute on sys.dbms_lob to scm ;
+grant execute on sys.dbms_lob to amon ;
+grant execute on sys.dbms_lob to rman ;
+grant execute on sys.dbms_lob to hue ;
+grant execute on sys.dbms_lob to scm ;
+grant execute on sys.dbms_lob to sentry ;
+grant execute on sys.dbms_lob to nav ;
+grant execute on sys.dbms_lob to navms ;
+grant execute on sys.dbms_lob to oozie ;
+
+/opt/cloudera/cm/schema/scm_prepare_database.sh oracle -h pr11036stc --scm-host pr11036stc scm scm_nw scm_nw
+
+/opt/cloudera/cm/schema/scm_prepare_database.sh oracle -h pr11036stc --scm-host pr11036stc data19c scm scm
+
+/opt/cloudera/cm/schema/scm_prepare_database.sh oracle -h test_server --scm-host test_server data19c scm scm
+
+
+postgres:
+$ vi /data/postgres_db/db_home/postgresql.conf
+$ vi /data/postgres_db/db_home/pg_hba.conf 
+
+restart the db:
+$/usr/PostgreSQL-11/bin/pg_ctl -D /data/postgres_db/db_home restart
+$psql
+#show port;
+#select version();
+
+postgres=#
+postgres=# create user hive with password 'hive';
+CREATE ROLE
+postgres=# create database hive owner=hive;
+CREATE DATABASE
+postgres=# grant all on database hive to hive;
+GRANT
+postgres=#
+
+create user grafana with password 'grafana';
+create database grafana owner=grafana;
+grant all on database grafana to grafana;
+
+
+
+/opt/cloudera/cm/schema/scm_prepare_database.sh postgresql -h <hostname> scm scm scm 
+/opt/cloudera/cm/schema/scm_prepare_database.sh postgresql -h pr11677-vftk-emea-rocfm --scm-host pr11677-vftk-emea-rocfm scm scm scm
+
+service cloudera-scm-agent start
+service cloudera-scm-server start
+
+systemctl restart cloudera-scm-agent
+systemctl restart cloudera-scm-server
+
+chkconfig cloudera-scm-agent on
+chkconfig cloudera-scm-server on 
+
+
+1.we need select all the servers for kafka   --> kafka meta.property file is in /var/local/kafka/data
+2.secordary namenode should last sever
+3.datanode should be [all-hosts]
+
+---
+If you face any error in kerberos:
+Topic Auto Creation
+auto.create.topics.enable --> true 
+
+cd /var/lib/zookeeper --> rm -rf *  --> clear everything and start the zookeeper 
+
+cat /var/local/kafka/data/meta.properties --> if broker id is getting affected 
+
+#Thu May 26 09:34:16 UTC 2022
+cluster.id=hBXJ3SIzQLGxX9F6t6rlmQ
+version=0
+broker.id=1546333688
+
+yarn.nodemanager.local-dirs
+
+------------------------------------------------------------------------------------------------------
+To remove all java files and update 
+
+yum remove java*
+[root@cloudera-dp-masternode-svr1 ~]# vi /etc/profile      --> export the java path and home here
+[root@cloudera-dp-masternode-svr1 ~]#
+[root@cloudera-dp-masternode-svr1 ~]# source /etc/profile   
+[root@cloudera-dp-masternode-svr1 ~]#
+[root@cloudera-dp-masternode-svr1 ~]# java -version
+
+--------------------------------------------------------------------------------------------------
+Autoshutdown script for CDH:
+
+[root@pr11596-umniah-emea-rocra subexuser]# cat CDH-auto-shutdown-script.sh
+#--generating valid ticket--#
+kinit -kt /home/subexuser/subexuser.keytab subexuser@HADOOP.COM
+
+echo "Killing running applications"
+
+#--list running applications--#
+sudo yarn application -list -appStates RUNNING | awk {'print $1}' | tail -n +3 > /tmp/job_list
+
+#--kill running yarn applications--#
+yarn application -kill $(cat /tmp/job_list | awk {'print $1}')
+
+echo "Stopping Hadoop services"
+
+curl -X POST -u admin:admin 'http://172.16.21.14:7180/api/v33/clusters/Umniah/commands/stop'
+
+echo "autoshutdown script executed successfully on $(date)"
+
+--------------------------------------------------------------------------------------------------------
+
+ssh-copy-id -i ~ appadmin@10.21.175.23
+
+ ssh-copy-id -i id_rsa.pub appadmin@10.21.175.24   --> this is used to copy the ssh key to other servers..so that the ssh will work
+ 

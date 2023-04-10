@@ -1,0 +1,792 @@
+login as: subexuser
+Passwd: mtni@123
+
+rpm -qa   --> will show all the packages..
+[subexuser@nimesh-node1 ~]$ hostname -i
+10.113.145.211
+[subexuser@nimesh-node1 ~]$
+[subexuser@nimesh-node1 ~]$ ll
+total 0
+[subexuser@nimesh-node1 ~]$ sudo su
+[sudo] password for subexuser:
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]# yum install telnet                                                                                                                                              1/1
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]# hostname -i
+10.113.145.211
+[root@nimesh-node1 subexuser]# service firewalld status
+
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]# yum install ntp httpd
+
+[root@nimesh-node1 subexuser]# systemctl enable httpd
+Created symlink from /etc/systemd/system/multi-user.target.wants/httpd.service to /usr/lib/systemd/system/httpd.service.
+
+[root@nimesh-node1 subexuser]# systemctl enable ntpd
+Created symlink from /etc/systemd/system/multi-user.target.wants/ntpd.service to /usr/lib/systemd/system/ntpd.service.
+[root@nimesh-node1 subexuser]#
+
+[root@nimesh-node1 subexuser]# service ntpd start
+Redirecting to /bin/systemctl start ntpd.service
+
+[root@nimesh-node1 subexuser]# systemctl status ntpd
+
+[root@nimesh-node1 subexuser]# service httpd start
+
+To make the server to start automatically: 
+==========================================
+
+[root@nimesh-node1 subexuser]# chkconfig httpd on
+Note: Forwarding request to 'systemctl enable httpd.service'.
+[root@nimesh-node1 subexuser]# chkconfig ntpd on
+Note: Forwarding request to 'systemctl enable ntpd.service'.
+[root@nimesh-node1 subexuser]#
+
+For timesync ( Namenode use this serverice):
+============================================
+
+[root@nimesh-node1 subexuser]# service rpcbind start
+Redirecting to /bin/systemctl start rpcbind.service
+Failed to start rpcbind.service: Unit not found.
+
+Make the swappiness to zero in sysctl.conf file:
+================================================
+
+
+[root@nimesh-node1 subexuser]# echo "vm.swappiness =0" >> /etc/sysctl.conf
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]# vi /etc/hosts
+[root@nimesh-node1 subexuser]# cat /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]# hostname
+nimesh-node1
+[root@nimesh-node1 subexuser]# hostname -f
+nimesh-node1
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]# sestatus
+SELinux status:                 enabled
+SELinuxfs mount:                /sys/fs/selinux
+SELinux root directory:         /etc/selinux
+Loaded policy name:             targeted
+Current mode:                   enforcing
+Mode from config file:          disabled
+Policy MLS status:              enabled
+Policy deny_unknown status:     allowed
+Max kernel policy version:      31
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]# hostname -i
+10.113.145.211
+[root@nimesh-node1 subexuser]# service rpcbind start
+Redirecting to /bin/systemctl start rpcbind.service
+Failed to start rpcbind.service: Unit not found.
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]# sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config
+[root@nimesh-node1 subexuser]# reboot
+
+[subexuser@nimesh-node1 ~]$ pwd
+/home/subexuser
+[subexuser@nimesh-node1 ~]$ sestatus
+SELinux status:                 disabled
+[subexuser@nimesh-node1 ~]$
+[subexuser@nimesh-node1 ~]$ hostname
+nimesh-node1
+[subexuser@nimesh-node1 ~]$ hostname -f
+nimesh-node1
+[subexuser@nimesh-node1 ~]$ hostname -i
+10.113.145.211
+
+[subexuser@nimesh-node1 ~]$ sudo su
+[sudo] password for subexuser:
+[root@nimesh-node1 subexuser]# yum install nfs-utils   --> if rpcbind doesn't work run this cmd
+[root@nimesh-node1 subexuser]# service rpcbind start
+Redirecting to /bin/systemctl start rpcbind.service
+[root@nimesh-node1 subexuser]# chkconfig rpcbind on
+Note: Forwarding request to 'systemctl enable rpcbind.service'.
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]# cat /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+[root@nimesh-node1 subexuser]# hostname -i
+10.113.145.211
+[root@nimesh-node1 subexuser]# hostname
+nimesh-node1
+[root@nimesh-node1 subexuser]# vi /etc/hosts
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]# cat /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+10.113.145.211   nimesh-node1
+10.113.145.212   nimesh-node2
+10.113.145.213   nimesh-node3
+[root@nimesh-node1 subexuser]#
+
+[root@nimesh-node1 subexuser]# ssh-keygen
+Generating public/private rsa key pair.
+Enter file in which to save the key (/root/.ssh/id_rsa):
+Enter passphrase (empty for no passphrase):
+Enter same passphrase again:
+Your identification has been saved in /root/.ssh/id_rsa.
+Your public key has been saved in /root/.ssh/id_rsa.pub.
+The key fingerprint is:
+SHA256:1l4ttM3qAg4l7lj19UIyKPjSKXjZMLgfexFIQetl1ic root@nimesh-node1
+The key's randomart image is:
++---[RSA 2048]----+
+|   .o.           |
+|    .. .         |
+|   o.o+ E.. .    |
+|  ..=++ ++o.o=   |
+|   o.O BS..=+.+  |
+|  o * X......o.  |
+|   o O + .. ..   |
+|    + o . ..     |
+|     .     ..    |
++----[SHA256]-----+
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]# cd /root/.ssh
+[root@nimesh-node1 .ssh]#
+[root@nimesh-node1 .ssh]# pwd
+/root/.ssh
+[root@nimesh-node1 .ssh]# ll
+total 12
+-rw-------  1 root root 1675 Feb 15 16:04 id_rsa
+-rw-r--r--  1 root root  399 Feb 15 16:04 id_rsa.pub
+-rw-r--r--. 1 root root  528 Feb 14 10:26 known_hosts
+[root@nimesh-node1 .ssh]# cat id_rsa.pub
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCb27q8K1AremJBFoyJMe4hX3vRx5Vrn3j8ikfRjjLVDIVHFinnE8aoXrW1PF0QJKBaQtJdK8D317rWWFPP86AmNfMSR9HvzbTRgNqTIy8uctygh2jIiX7I/cERNwECSPxjQVu62p486ezrpExGxMNC2tJ4ZbUUnri0zLYiEdkKMB1rQ8LSrh/Xn9jXWTUH5FOAVkq2M6wD2acVE+94AP5s06ic+KRqNDfYxg8mqL9yRH8sY/eaD/CHKo/FAb6N7bbSVMqLVT2rcpYTkDAuo8uoYrgkDOc33Xm0wokWkGqBbDBHKpFuahaMTER+r8qbMKUc6+HDSFUIUoDyykdb4V1R root@nimesh-node1
+[root@nimesh-node1 .ssh]#
+[root@nimesh-node1 .ssh]# vi authorized_keys
+[root@nimesh-node1 .ssh]#
+[root@nimesh-node1 .ssh]# ll
+total 16
+-rw-r--r--  1 root root 1200 Feb 15 16:11 authorized_keys
+-rw-------  1 root root 1675 Feb 15 16:04 id_rsa
+-rw-r--r--  1 root root  399 Feb 15 16:04 id_rsa.pub
+-rw-r--r--. 1 root root  528 Feb 14 10:26 known_hosts
+[root@nimesh-node1 .ssh]#
+[root@nimesh-node1 .ssh]# hostname -i
+10.113.145.211
+[root@nimesh-node1 .ssh]# ssh 10.113.145.212
+
+
+[root@nimesh-node1 .ssh]#
+[root@nimesh-node1 .ssh]# exit
+exit
+
+[root@nimesh-node1 .ssh]# pwd
+/root/.ssh
+[root@nimesh-node1 .ssh]# chmod 700 ~/.ssh
+[root@nimesh-node1 .ssh]# ll
+total 16
+-rw-r--r--  1 root root 1199 Feb 15 16:21 authorized_keys
+-rw-------  1 root root 1675 Feb 15 16:04 id_rsa
+-rw-r--r--  1 root root  399 Feb 15 16:04 id_rsa.pub
+-rw-r--r--. 1 root root  528 Feb 14 10:26 known_hosts
+[root@nimesh-node1 .ssh]# chmod 600 ~/.ssh/authorized_keys
+[root@nimesh-node1 .ssh]#
+[root@nimesh-node1 .ssh]# chmod 644 ~/.ssh/authorized_keys
+[root@nimesh-node1 .ssh]# ll
+total 16
+-rw-r--r--  1 root root 1199 Feb 15 16:21 authorized_keys
+-rw-------  1 root root 1675 Feb 15 16:04 id_rsa
+-rw-r--r--  1 root root  399 Feb 15 16:04 id_rsa.pub
+-rw-r--r--. 1 root root  528 Feb 14 10:26 known_hosts
+
+[root@nimesh-node1 .ssh]#
+[root@nimesh-node1 .ssh]# pwd
+/root/.ssh
+[root@nimesh-node1 .ssh]#
+[root@nimesh-node1 .ssh]#
+[root@nimesh-node1 .ssh]# cat /etc/os-release
+NAME="CentOS Linux"
+VERSION="7 (Core)"
+ID="centos"
+ID_LIKE="rhel fedora"
+VERSION_ID="7"
+PRETTY_NAME="CentOS Linux 7 (Core)"
+ANSI_COLOR="0;31"
+CPE_NAME="cpe:/o:centos:centos:7"
+HOME_URL="https://www.centos.org/"
+BUG_REPORT_URL="https://bugs.centos.org/"
+
+CENTOS_MANTISBT_PROJECT="CentOS-7"
+CENTOS_MANTISBT_PROJECT_VERSION="7"
+REDHAT_SUPPORT_PRODUCT="centos"
+REDHAT_SUPPORT_PRODUCT_VERSION="7"
+
+[root@nimesh-node1 .ssh]#
+[root@nimesh-node1 .ssh]#
+[root@nimesh-node1 .ssh]# ll
+total 16
+-rw-r--r--  1 root root 1199 Feb 15 17:24 authorized_keys
+-rw-------  1 root root 1675 Feb 15 17:12 id_rsa
+-rw-r--r--  1 root root  399 Feb 15 17:12 id_rsa.pub
+-rw-r--r--. 1 root root  528 Feb 14 10:26 known_hosts
+[root@nimesh-node1 .ssh]#
+[subexuser@nimesh-node1 .ssh]$ cat /etc/hosts
+127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4
+::1         localhost localhost.localdomain localhost6 localhost6.localdomain6
+10.113.145.211   nimesh-node1
+10.113.145.212   nimesh-node2
+10.113.145.213   nimesh-node3
+[subexuser@nimesh-node1 .ssh]$ cd
+[subexuser@nimesh-node1 ~]$ ssh 10.113.145.212
+####################################################################
+
+[subexuser@nimesh-node2 ~]$
+[subexuser@nimesh-node2 ~]$ cd /etc/ssh
+[subexuser@nimesh-node2 ssh]$ ll
+total 604
+-rw-r--r--. 1 root root     581843 Aug  9  2019 moduli
+-rw-r--r--. 1 root root       2276 Aug  9  2019 ssh_config
+-rw-------. 1 root root       3944 Feb 14 11:15 sshd_config
+-rw-r-----. 1 root ssh_keys    227 Feb 14 09:44 ssh_host_ecdsa_key
+-rw-r--r--. 1 root root        162 Feb 14 09:44 ssh_host_ecdsa_key.pub
+-rw-r-----. 1 root ssh_keys    387 Feb 14 09:44 ssh_host_ed25519_key
+-rw-r--r--. 1 root root         82 Feb 14 09:44 ssh_host_ed25519_key.pub
+-rw-r-----. 1 root ssh_keys   1675 Feb 14 09:44 ssh_host_rsa_key
+-rw-r--r--. 1 root root        382 Feb 14 09:44 ssh_host_rsa_key.pub
+
+[subexuser@nimesh-node1 ~]$ hostname -i
+10.113.145.211
+[subexuser@nimesh-node1 ~]$ sudo su
+[sudo] password for subexuser:
+[root@nimesh-node1 subexuser]# exit
+exit
+[subexuser@nimesh-node1 ~]$ sudo systemctl status httpd
+
+[subexuser@nimesh-node1 ~]$
+[subexuser@nimesh-node1 ~]$ pwd
+/home/subexuser
+[subexuser@nimesh-node1 ~]$ ll
+total 0
+
+[subexuser@nimesh-node1 ~]$
+[subexuser@nimesh-node1 ~]$ cd /etc
+[subexuser@nimesh-node1 etc]$ cd yum.repos.d
+[subexuser@nimesh-node1 yum.repos.d]$ ll
+total 40
+-rw-r--r--. 1 root root 1664 Oct 23  2020 CentOS-Base.repo
+-rw-r--r--. 1 root root 1309 Oct 23  2020 CentOS-CR.repo
+-rw-r--r--. 1 root root  649 Oct 23  2020 CentOS-Debuginfo.repo
+-rw-r--r--. 1 root root  314 Oct 23  2020 CentOS-fasttrack.repo
+-rw-r--r--. 1 root root  630 Oct 23  2020 CentOS-Media.repo
+-rw-r--r--. 1 root root 1331 Oct 23  2020 CentOS-Sources.repo
+-rw-r--r--. 1 root root 8515 Oct 23  2020 CentOS-Vault.repo
+-rw-r--r--. 1 root root  616 Oct 23  2020 CentOS-x86_64-kernel.repo
+[subexuser@nimesh-node1 yum.repos.d]$ sudo su
+[sudo] password for subexuser:
+[root@nimesh-node1 yum.repos.d]# pwd
+/etc/yum.repos.d
+[root@nimesh-node1 yum.repos.d]# vi ambari.repo
+
+CREATING THE LOCAL REPO FILE: 
+
+[root@nimesh-node1 yum.repos.d]# cat ambari.repo
+#VERSION_NUMBER=2.7.3.39-2
+[ambari-2.7.3.39-2]
+#json.url = http://private-repo-1.hortonworks.com/HDP/hdpdev_urlinfo.json
+name=ambari Version - ambari-2.7.3.39-2
+baseurl=https://archive.cloudera.com/p/ambari/2.x/2.7.3.39/centos7
+gpgcheck=1
+gpgkey=https://archive.cloudera.com/p/ambari/2.x/2.7.3.39/centos7/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins
+username=f91d4fc9-2987-40b2-a138-faa4bb55ac19
+password=4890f68091a4
+enabled=1
+priority=1
+
+
+[root@nimesh-node1 yum.repos.d]#
+[root@nimesh-node1 yum.repos.d]# yum repolist
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: centos.excellmedia.net
+ * extras: centos.excellmedia.net
+ * updates: centos.excellmedia.net
+ambari-2.7.3.39-2                                                                                                                                                     | 2.9 kB  00:00:00
+base                                                                                                                                                                  | 3.6 kB  00:00:00
+extras                                                                                                                                                                | 2.9 kB  00:00:00
+updates                                                                                                                                                               | 2.9 kB  00:00:00
+(1/2): updates/7/x86_64/primary_db                                                                                                                                    |  13 MB  00:00:01
+(2/2): ambari-2.7.3.39-2/primary_db                                                                                                                                   |  25 kB  00:00:03
+repo id                                                                            repo name                                                                                           status
+ambari-2.7.3.39-2                                                                  ambari Version - ambari-2.7.3.39-2                                                                      13
+base/7/x86_64                                                                      CentOS-7 - Base                                                                                     10,072
+extras/7/x86_64                                                                    CentOS-7 - Extras                                                                                      500
+updates/7/x86_64                                                                   CentOS-7 - Updates                                                                                   3,414
+repolist: 13,999
+
+[root@nimesh-node1 yum.repos.d]# yum makecache
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: mirrors.vhost.vn
+ * extras: mirrors.vhost.vn
+ * updates: mirrors.vhost.vn
+ambari-2.7.3.39-2                                                                                                                                                     | 2.9 kB  00:00:00
+base                                                                                                                                                                  | 3.6 kB  00:00:00
+extras                                                                                                                                                                | 2.9 kB  00:00:00
+updates                                                                                                                                                               | 2.9 kB  00:00:00
+(1/8): extras/7/x86_64/filelists_db                                                                                                                                   | 259 kB  00:00:00
+(2/8): extras/7/x86_64/other_db                                                                                                                                       | 145 kB  00:00:00
+(3/8): base/7/x86_64/other_db                                                                                                                                         | 2.6 MB  00:00:00
+(4/8): updates/7/x86_64/other_db                                                                                                                                      | 960 kB  00:00:00
+(5/8): base/7/x86_64/filelists_db                                                                                                                                     | 7.2 MB  00:00:02
+(6/8): updates/7/x86_64/filelists_db                                                                                                                                  | 7.4 MB  00:00:02
+(7/8): ambari-2.7.3.39-2/other_db                                                                                                                                     | 1.4 kB  00:00:03
+(8/8): ambari-2.7.3.39-2/filelists_db                                                                                                                                 | 103 kB  00:00:03
+Metadata Cache Created
+[root@nimesh-node1 yum.repos.d]#
+[root@nimesh-node1 yum.repos.d]# yum list all | grep ambari
+ambari-agent.x86_64                         2.7.3.39-2                 ambari-2.7.3.39-2
+ambari-infra-manager.noarch                 2.7.3.39-2                 ambari-2.7.3.39-2
+ambari-infra-solr.noarch                    2.7.3.39-2                 ambari-2.7.3.39-2
+ambari-infra-solr-client.noarch             2.7.3.39-2                 ambari-2.7.3.39-2
+ambari-logsearch-logfeeder.noarch           2.7.3.39-2                 ambari-2.7.3.39-2
+ambari-logsearch-portal.noarch              2.7.3.39-2                 ambari-2.7.3.39-2
+ambari-metrics-collector.x86_64             2.7.3.39-2                 ambari-2.7.3.39-2
+ambari-metrics-common.noarch                2.7.3.39-2                 ambari-2.7.3.39-2
+ambari-metrics-grafana.x86_64               2.7.3.39-2                 ambari-2.7.3.39-2
+ambari-metrics-hadoop-sink.x86_64           2.7.3.39-2                 ambari-2.7.3.39-2
+ambari-metrics-monitor.x86_64               2.7.3.39-2                 ambari-2.7.3.39-2
+ambari-server.x86_64                        2.7.3.39-2                 ambari-2.7.3.39-2
+smartsense-hst.x86_64                       1.5.1.2.7.3.39-2           ambari-2.7.3.39-2
+
+[root@nimesh-node1 yum.repos.d]# yum install ambari-server.x86_64 ambari-agent.x86_64 -y
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+ * base: centos.excellmedia.net
+ * extras: centos.excellmedia.net
+ * updates: centos.excellmedia.net
+Resolving Dependencies
+--> Running transaction check
+---> Package ambari-agent.x86_64 0:2.7.3.39-2 will be installed
+---> Package ambari-server.x86_64 0:2.7.3.39-2 will be installed
+--> Processing Dependency: postgresql-server >= 8.1 for package: ambari-server-2.7.3.39-2.x86_64
+--> Running transaction check
+---> Package postgresql-server.x86_64 0:9.2.24-7.el7_9 will be installed
+--> Processing Dependency: postgresql-libs(x86-64) = 9.2.24-7.el7_9 for package: postgresql-server-9.2.24-7.el7_9.x86_64
+--> Processing Dependency: postgresql(x86-64) = 9.2.24-7.el7_9 for package: postgresql-server-9.2.24-7.el7_9.x86_64
+--> Processing Dependency: libpq.so.5()(64bit) for package: postgresql-server-9.2.24-7.el7_9.x86_64
+--> Running transaction check
+---> Package postgresql.x86_64 0:9.2.24-7.el7_9 will be installed
+---> Package postgresql-libs.x86_64 0:9.2.24-7.el7_9 will be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+=============================================================================================================================================================================================
+ Package                                          Arch                                  Version                                       Repository                                        Size
+=============================================================================================================================================================================================
+Installing:
+ ambari-agent                                     x86_64                                2.7.3.39-2                                    ambari-2.7.3.39-2                                 37 M
+ ambari-server                                    x86_64                                2.7.3.39-2                                    ambari-2.7.3.39-2                                353 M
+Installing for dependencies:
+ postgresql                                       x86_64                                9.2.24-7.el7_9                                updates                                          3.0 M
+ postgresql-libs                                  x86_64                                9.2.24-7.el7_9                                updates                                          235 k
+ postgresql-server                                x86_64                                9.2.24-7.el7_9                                updates                                          3.8 M
+
+Transaction Summary
+=============================================================================================================================================================================================
+Install  2 Packages (+3 Dependent packages)
+
+Total download size: 397 M
+Installed size: 522 M
+Downloading packages:
+(1/5): postgresql-libs-9.2.24-7.el7_9.x86_64.rpm                                                                                                                      | 235 kB  00:00:00
+(2/5): postgresql-9.2.24-7.el7_9.x86_64.rpm                                                                                                                           | 3.0 MB  00:00:00
+(3/5): postgresql-server-9.2.24-7.el7_9.x86_64.rpm                                                                                                                    | 3.8 MB  00:00:01
+warning: /var/cache/yum/x86_64/7/ambari-2.7.3.39-2/packages/ambari-agent-2.7.3.39-2.x86_64.rpm: Header V4 RSA/SHA1 Signature, key ID 07513cad: NOKEY       ] 1.6 MB/s |  62 MB  00:03:31 ETA
+Public key for ambari-agent-2.7.3.39-2.x86_64.rpm is not installed
+(4/5): ambari-agent-2.7.3.39-2.x86_64.rpm                                                                                                                             |  37 MB  00:00:24
+(5/5): ambari-server-2.7.3.39-2.x86_64.rpm                                      18% [=============   
+
+
+DOWNLOAD THE DB CONNECTOR FILE AND MOVE TO /usr/share/java PATH:
+
+[root@nimesh-node1 subexuser]# mv postgresql-connector-java\ \(2\).jar postgresql-connector-java.jar
+[root@nimesh-node1 subexuser]# ll
+total 984
+-rw-rw-r-- 1 subexuser subexuser 1004719 Feb 16 16:25 postgresql-connector-java.jar
+
+
+----------------------------------------
+Before running the ambari setup run the below command in database
+
+[subexuser@nimesh-node1 ~]$
+[subexuser@nimesh-node1 ~]$ psql
+psql: could not connect to server: No such file or directory
+        Is the server running locally and accepting
+        connections on Unix domain socket "/var/run/postgresql/.s.PGSQL.5432"?
+
+Create the database before running the below cmd:
+
+[subexuser@nimesh-node1 ~]$ psql -h pr3038-optus-node1 -U ambari -d ambari
+psql: could not translate host name "nimesh-node4" to address: Name or service not known
+[subexuser@nimesh-node1 ~]$ psql -h 10.113.145.214 -U ambari -d ambari
+psql (9.2.24, server 9.6.10)
+WARNING: psql version 9.2, server version 9.6.
+         Some psql features might not work.
+Type "help" for help.
+
+ambari=>
+ambari=> \i /var/lib/ambari-server/resources/Ambari-DDL-Postgres-CREATE.sql
+
+Oracle: \i /var/lib/ambari-server/resources/Ambari-DDL-Oracle-CREATE.sql
+
+sqlplus ambari/ambari@data12c < /var/lib/ambari-server/resources/Ambari-DDL-Oracle-CREATE.sql
+
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]# ambari-server setup
+                                                      ] 1.1 MB/s |  75 MB  00:04:51 ETA		
+													  
+													  # ls -al /usr/share/java/oracle-connector-java.jar
+												 ambari-server setup --jdbc-db=oracle --jdbc-driver=/usr/share/java/oracle-connector-java.jar
+													  cat /etc/ambari-server/conf/ambari.properties | grep oracle-connector-java.jar
+[root@nimesh-node1 subexuser]# 
+"server.jdbc.driver.path
+
+server.jdbc.driver.path=[path/to/custom_jdbc_driver]" in ambari.properties.
+
+WARNING: Before starting Ambari Server, you must run the following DDL directly from the database shell to create the schema: /var/lib/ambari-server/resources/Ambari-DDL-Postgres-CREATE.sql
+Proceed with configuring remote database connection properties [y/n] (y)? ^C
+Aborting ... Keyboard Interrupt.
+
+--------------------------------------------
+
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]# ambari-server setup
+Using python  /usr/bin/python
+Setup ambari-server
+Checking SELinux...
+SELinux status is 'disabled'
+Customize user account for ambari-server daemon [y/n] (n)? n
+Adjusting ambari-server permissions and ownership...
+Checking firewall status...
+Checking JDK...
+Do you want to change Oracle JDK [y/n] (n)? y
+[1] Oracle JDK 1.8 + Java Cryptography Extension (JCE) Policy Files 8
+[2] Custom JDK
+==============================================================================
+Enter choice (1): 1
+JDK already exists, using /var/lib/ambari-server/resources/jdk-8u112-linux-x64.tar.gz
+Installing JDK to /usr/jdk64/
+Successfully installed JDK to /usr/jdk64/
+JCE Policy archive already exists, using /var/lib/ambari-server/resources/jce_policy-8.zip
+Installing JCE policy...
+Check JDK version for Ambari Server...
+JDK version found: 8
+Minimum JDK version is 8 for Ambari. Skipping to setup different JDK for Ambari Server.
+Checking GPL software agreement...
+Completing setup...
+Configuring database...
+Enter advanced database configuration [y/n] (n)? y
+Configuring database...
+==============================================================================
+Choose one of the following options:
+[1] - PostgreSQL (Embedded)
+[2] - Oracle
+[3] - MySQL / MariaDB
+[4] - PostgreSQL
+[5] - Microsoft SQL Server (Tech Preview)
+[6] - SQL Anywhere
+[7] - BDB
+==============================================================================
+Enter choice (4): 4
+Hostname (nimesh-node4): 10.113.145.214
+Port (5432): 5432
+Database name (ambari): ambari
+Postgres schema (ambari): ambari
+Username (ambari): ambari
+Enter Database Password (ambari):
+Configuring ambari database...
+Configuring remote database connection properties...
+WARNING: Before starting Ambari Server, you must run the following DDL directly from the database shell to create the schema: /var/lib/ambari-server/resources/Ambari-DDL-Postgres-CREATE.sql
+Proceed with configuring remote database connection properties [y/n] (y)? y
+Extracting system views...
+ambari-admin-2.7.3.39.2.jar
+....
+Ambari repo file contains latest json url http://private-repo-1.hortonworks.com/HDP/hdpdev_urlinfo.json, updating stacks repoinfos with it...
+Adjusting ambari-server permissions and ownership...
+Ambari Server 'setup' completed successfully.
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]#
+
+export PATH=$PATH:/usr/jdk64/jdk1.8.0_112/bin:$PATH
+export JAVA_HOME=/usr/jdk64/jdk1.8.0_112
+
+[root@nimesh-node1 subexuser]# ambari-server start
+Using python  /usr/bin/python
+Starting ambari-server
+Ambari Server running with administrator privileges.
+Organizing resource files at /var/lib/ambari-server/resources...
+Ambari database consistency check started...
+Server PID at: /var/run/ambari-server/ambari-server.pid
+Server out at: /var/log/ambari-server/ambari-server.out
+Server log at: /var/log/ambari-server/ambari-server.log
+Waiting for server start..................
+Server started listening on 8080
+
+DB configs consistency check found warnings. See /var/log/ambari-server/ambari-server-check-database.log for more details.
+Ambari Server 'start' completed successfully.
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]# ambari-server status
+Using python  /usr/bin/python
+Ambari-server status
+Ambari Server running
+Found Ambari Server PID: 10440 at: /var/run/ambari-server/ambari-server.pid
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]#
+[root@nimesh-node1 subexuser]# hostname -i
+10.113.145.211
+
+change the hostname = <nimesh-node1> in all the server:
+
+[root@nimesh-node1 subexuser]# cd /etc/ambari-agent/conf/
+ambari-agent.ini     logging.conf.sample
+[root@nimesh-node1 subexuser]# cd /etc/ambari-agent/conf/
+[root@nimesh-node1 conf]# ll
+total 8
+-rw-r--r-- 1 root root 2560 Jan 13  2021 ambari-agent.ini
+-rw-r--r-- 1 root root 2694 Jan 13  2021 logging.conf.sample
+[root@nimesh-node1 conf]# vi ambari-agent.ini
+[root@nimesh-node1 conf]#
+[root@nimesh-node1 conf]# ambari-agent start
+Verifying Python version compatibility...
+Using python  /usr/bin/python
+Checking for previously running Ambari Agent...
+Checking ambari-common dir...
+Starting ambari-agent
+Verifying ambari-agent process status...
+Ambari Agent successfully started
+Agent PID at: /run/ambari-agent/ambari-agent.pid
+Agent out at: /var/log/ambari-agent/ambari-agent.out
+Agent log at: /var/log/ambari-agent/ambari-agent.log
+[root@nimesh-node1 conf]#
+
+If any error comes during ambari-server setup: 
+
+# ambari-server setup --jdbc-db=oracle --jdbc-driver=/usr/share/java/oracle-connector-java.jar
+ambari-server setup --jdbc-db=postgres --jdbc-driver=/usr/share/java/postgresql-connector-java.jar
+
+ambari-server setup --jdbc-db=postgres --jdbc-driver=/path/to/postgres/org.postgresql.Driver
+
+server.jdbc.driver.path=/usr/share/java 
+server.jdbc.url=jdbc:postgresql://nimesh-node4.app.org:5432/ambari  --> check the hostname should be given 
+
+Download the hdp utilities and Copy it to the /var/www/html/ path: 
+3.1version:
+===========
+wget https://f91d4fc9-2987-40b2-a138-faa4bb55ac19:4890f68091a4@archive.cloudera.com/p/HDP/centos7/3.x/updates/3.1.0.0/HDP-3.1.0.0-centos7-rpm.tar.gz
+
+wget https://f91d4fc9-2987-40b2-a138-faa4bb55ac19:4890f68091a4@archive.cloudera.com/p/HDP-UTILS/1.1.0.22/repos/centos7/HDP-UTILS-1.1.0.22-centos7.tar.gz
+
+wget https://f91d4fc9-2987-40b2-a138-faa4bb55ac19:4890f68091a4@archive.cloudera.com/p/HDP-GPL/3.x/3.1.0.0/centos7/HDP-GPL-3.1.0.0-centos7-gpl.tar.gz 
+------------------------
+2.63 version:
+=============
+wget https://f91d4fc9-2987-40b2-a138-faa4bb55ac19:4890f68091a4@archive.cloudera.com/p/ambari/2.x/2.6.2.0/centos7/ambari-2.6.2.0-centos7.tar.gz
+
+wget https://f91d4fc9-2987-40b2-a138-faa4bb55ac19:4890f68091a4@archive.cloudera.com/p/HDP/2.x/2.6.3.0/centos7/HDP-2.6.3.0-centos7-rpm.tar.gz
+
+wget https://f91d4fc9-2987-40b2-a138-faa4bb55ac19:4890f68091a4@archive.cloudera.com/p/HDP-UTILS/1.1.0.22/repos/centos7/HDP-UTILS-1.1.0.22-centos7.tar.gz
+--------------------------
+2.6.5 version:
+==============
+wget https://f91d4fc9-2987-40b2-a138-faa4bb55ac19:4890f68091a4@archive.cloudera.com/p/ambari/2.x/2.7.1.0/centos7/ambari-2.7.1.0-centos7.tar.gz
+wget https://f91d4fc9-2987-40b2-a138-faa4bb55ac19:4890f68091a4@archive.cloudera.com/p/HDP/2.x/2.6.5.0/centos7/HDP-2.6.5.0-centos7-rpm.tar.gz
+wget https://f91d4fc9-2987-40b2-a138-faa4bb55ac19:4890f68091a4@archive.cloudera.com/p/HDP-UTILS/1.1.0.22/repos/centos7/HDP-UTILS-1.1.0.22-centos7.tar.gz
+
+
+[root@nimesh-node1 html]# ll
+total 8942948
+drwxr-xr-x 3 subexuser users         21 Dec 11  2018 HDP
+-rw-r--r-- 1 root      root  9066967592 Jan 17  2021 HDP-3.1.0.0-centos7-rpm.tar.gz
+drwxr-xr-x 3 subexuser users         21 Aug 13  2018 HDP-UTILS
+-rw-r--r-- 1 root      root    90606616 Dec 11  2019 HDP-UTILS-1.1.0.22-centos7.tar.gz
+
+
+Download the HDF package: 
+
+yum install hdp-select  --> used to check whether the package is present or not 
+
+----------------
+KERBEROS ENABLING:
+yum install krb5-server krb5-libs krb5-workstation
+
+cd /var/kerberos/krb5kdc
+
+[root@nimesh-node1 www]# cd /var/kerberos/krb5kdc
+[root@nimesh-node1 krb5kdc]# ll
+total 8
+-rw------- 1 root root  22 Sep 30  2020 kadm5.acl
+-rw------- 1 root root 451 Sep 30  2020 kdc.conf
+[root@nimesh-node1 krb5kdc]#
+[root@nimesh-node1 krb5kdc]# vi kadm5.acl
+[root@nimesh-node1 krb5kdc]# vi kadm5.acl
+[root@nimesh-node1 krb5kdc]# cat kadm5.acl
+*/admin@HADOOP.COM      *
+[root@nimesh-node1 krb5kdc]#
+[root@nimesh-node1 krb5kdc]# vi kdc.conf
+[root@nimesh-node1 krb5kdc]# cat kdc.conf
+[kdcdefaults]
+ kdc_ports = 88
+ kdc_tcp_ports = 88
+
+[realms]
+ HADOOP.COM = {
+  #master_key_type = aes256-cts
+  acl_file = /var/kerberos/krb5kdc/kadm5.acl
+  dict_file = /usr/share/dict/words
+  admin_keytab = /var/kerberos/krb5kdc/kadm5.keytab
+  supported_enctypes = aes256-cts:normal aes128-cts:normal des3-hmac-sha1:normal arcfour-hmac:normal camellia256-cts:normal camellia128-cts:normal des-hmac-sha1:normal des-cbc-md5:normal des-cbc-crc:normal
+ }
+
+
+/etc/krb5.conf                                            pr11677-vftk-emea-rocfm
+
+[root@nimesh-node1 krb5kdc]# vi /etc/krb5.conf
+[root@nimesh-node1 krb5kdc]# cat /etc/krb5.conf
+# Configuration snippets may be placed in this directory as well
+includedir /etc/krb5.conf.d/
+
+[logging]
+ default = FILE:/var/log/krb5libs.log
+ kdc = FILE:/var/log/krb5kdc.log
+ admin_server = FILE:/var/log/kadmind.log
+
+[libdefaults]
+ dns_lookup_realm = false
+ ticket_lifetime = 24h
+ renew_lifetime = 7d
+ forwardable = true
+ rdns = false
+ pkinit_anchors = FILE:/etc/pki/tls/certs/ca-bundle.crt
+ default_realm = HADOOP.COM
+ default_ccache_name = KEYRING:persistent:%{uid}
+
+[realms]
+ HADOOP.COM = {
+  kdc = nimesh-node1
+  admin_server = nimesh-node1
+ }
+
+[domain_realm]
+ .hadoop.com = HADOOP.COM
+ hadoop.com = HADOOP.COM
+[root@nimesh-node1 krb5kdc]# hostname -f
+nimesh-node1
+
+kdb5_util create -s 
+
+admin / admin 
+
+[root@pr11335-pldt-test krb5kdc]# systemctl start krb5kdc
+[root@pr11335-pldt-test krb5kdc]# systemctl start kadmin
+
+[root@pr11335-pldt-test krb5kdc]# systemctl enable krb5kdc
+Created symlink from /etc/systemd/system/multi-user.target.wants/krb5kdc.service to /usr/lib/systemd/system/krb5kdc.service.
+[root@pr11335-pldt-test krb5kdc]#
+[root@pr11335-pldt-test krb5kdc]# systemctl enable kadmin
+Created symlink from /etc/systemd/system/multi-user.target.wants/kadmin.service to /usr/lib/systemd/system/kadmin.service.
+
+[root@pr11335-pldt-test krb5kdc]# kadmin.local
+Authenticating as principal root/admin@HADOOP.COM with password.
+kadmin.local:  addprinc admin/admin
+WARNING: no policy specified for admin/admin@HADOOP.COM; defaulting to no policy
+Enter password for principal "admin/admin@HADOOP.COM":
+Re-enter password for principal "admin/admin@HADOOP.COM":
+Principal "admin/admin@HADOOP.COM" created.
+
+[root@pr11335-pldt-test krb5kdc]# kinit admin/admin
+Password for admin/admin@HADOOP.COM:
+[root@pr11335-pldt-test krb5kdc]#
+[root@pr11335-pldt-test krb5kdc]# klist
+Ticket cache: KEYRING:persistent:0:0
+Default principal: admin/admin@HADOOP.COM
+
+Valid starting       Expires              Service principal
+05/10/2022 11:14:07  05/11/2022 11:14:07  krbtgt/HADOOP.COM@HADOOP.COM
+
+#kadmin.local
+ :listprincs
+ :addprinc subexuser  --> generating principle
+
+ :xst -kt /home/subexuser/subexuser.keytab subexuser@HADOOP.COM  --> generating keytab 
+-------------------------
+
+In UI: --> enable the kerberos
+
+vi /etc/passwd   --> hdfs:x:39998:39998:Hadoop HDFS:/var/lib/hadoop-hdfs:/usr/bin/bash   --> from nologin to /bin/bash
+
+Create principal for hdfs 
+
+---------------------------------------------------------
+
+jdbc:postgresql://pr11335-pldt-test:5432/hive
+
+org.postgresql.Driver
+
+For removing the ambari agent:
+
+yum remove ambari-agent -y
+
+For removing java jdk:
+
+yum remove java*  --> name of that jdk or java it starts with 
+
+https://community.cloudera.com/t5/Support-Questions/Ambari-host-registration-with-server-failed-with/m-p/118797 
+
+Back up your Ambari DB   -->  pg_dump database_name > database_name_20160527.sql 
+to take metadata of DB   -->  pg_dump -s database_name > database_name_20160527.sql   ( s-->represents schema only) 
+
+To dump that database  --> psql --> hive# \i database_name_20160527.sql 
+
+--------------------------------------------
+HDF INSTALLATION:
+==================
+Create the hdf.repo file on all the host at /etc/yum.repos.d/hdf.repo : copy the HDF package to /var/www/html path:
+
+#VERSION_NUMBER=3.4.1.1-4
+[HDF-3.4.1.1]
+name=HDF Version - HDF-3.4.1.1
+baseurl=http://10.113.145.211/HDF/centos7/3.4.1.1-4/
+gpgcheck=1
+gpgkey=http://10.113.145.211/HDF/centos7/3.4.1.1-4/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins
+enabled=1
+priority=1
+
+
+[HDP-UTILS-1.1.0.22]
+name=HDP-UTILS Version - HDP-UTILS-1.1.0.22
+baseurl=http://10.113.145.211/HDP-UTILS/centos7/1.1.0.22/
+gpgcheck=1
+gpgkey=http://10.113.145.211/HDF/centos7/3.4.1.1-4/RPM-GPG-KEY/RPM-GPG-KEY-Jenkins
+enabled=1
+priority=1
+
+-----
+
+yum clean all
+yum repolist
+
+yum install nifi*
+
+Download the mpack package and move that to /tmp path then execute the below command:
+
+mv /home/subexuser/hdf-ambari-mpack-3.4.1.1-4.tar.gz /tmp
+
+ambari-server install-mpack --mpack /tmp/hdf-ambari-mpack-3.4.1.1-4.tar.gz --verbose
+
+ambari-server restart
+
+UI:
+add nifi --> restart all requried   password: subexuser@123 
+
+-----------------------------------------------
+
